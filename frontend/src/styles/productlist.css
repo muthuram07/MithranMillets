@@ -1,0 +1,200 @@
+/* page background & container */
+.pl-page {
+  min-height: 100vh;
+  padding-top: 64px;
+  padding-bottom: 64px;
+  background: linear-gradient(180deg, #fbf7ef 0%, #f0e6cf 100%);
+}
+
+/* title */
+.pl-title {
+  font-weight: 700;
+  color: #0b3d2e;
+  text-align: center;
+  margin-bottom: 24px;
+  font-family: Georgia, serif;
+  letter-spacing: 0.4px;
+}
+
+/* search paper */
+.pl-search-paper {
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.95);
+}
+
+.pl-search-stack {
+  justify-content: center;
+  align-items: center;
+}
+
+.pl-search-field {
+  background-color: #fff;
+  border-radius: 10px;
+  max-width: 520px;
+}
+
+/* reset button */
+.pl-reset-btn {
+  border-color: #c5b089 !important;
+  color: #2d6a4f !important;
+  text-transform: none !important;
+  border-radius: 8px !important;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+}
+
+/* loading box */
+.pl-loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 96px 0;
+}
+
+/* no products */
+.pl-no-products {
+  padding: 48px;
+  text-align: center;
+  border-radius: 12px;
+}
+
+/* grid item should stretch */
+.pl-grid-item {
+  display: flex;
+}
+
+/* ensure grid container forces items to stretch */
+.pl-grid {
+  align-items: stretch;
+}
+
+/* card layout: fixed rectangle */
+.pl-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(11,61,46,0.08);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  height: 100%;
+  /* increase minimum so all cards align better */
+  min-height: 520px;
+  width: 100%;
+}
+
+/* image area: use aspect-ratio to keep uniform sizes regardless of source image */
+.pl-image-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  aspect-ratio: 4 / 3; /* consistent box */
+  background: #f5f5f5; /* subtle placeholder while image loads */
+}
+
+.pl-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center; /* center crop */
+  display: block;
+}
+
+/* category badge */
+.pl-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255,255,255,0.95);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  color: #2d6a4f;
+  font-size: 12px;
+}
+
+/* content area */
+.pl-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+  padding-top: 16px !important;
+  padding-bottom: 16px !important;
+}
+
+.pl-name {
+  font-weight: 700;
+  color: #0b3d2e;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; /* standard fallback for linters */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pl-price {
+  font-weight: 700;
+  color: #2d6a4f;
+}
+
+.pl-desc {
+  color: #6b6b6b;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3; /* standard fallback for linters */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.pl-stock {
+  margin-top: 8px;
+}
+
+/* actions pinned to bottom */
+.pl-actions {
+  display: flex;
+  gap: 10px;
+  padding: 16px;
+  margin-top: auto;
+}
+
+.pl-view-btn {
+  background-color: #2d6a4f;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 8px;
+  text-transform: none;
+}
+
+.pl-add-btn {
+  text-transform: none;
+  border-radius: 8px;
+  font-weight: 700;
+  background-color: #8fbf94;
+  color: #fff;
+}
+
+.pl-add-btn.pl-added {
+  background-color: #fff !important;
+  color: #2d6a4f !important;
+  border: 1px solid #2d6a4f !important;
+}
+
+/* login dialog login button */
+.pl-login-btn {
+  background-color: #2d6a4f !important;
+  color: #fff !important;
+}
+
+/* responsive tweaks */
+@media (max-width: 900px) {
+  .pl-card { min-height: 560px; }
+  .pl-image-wrap { aspect-ratio: 4 / 3; }
+}
+
+@media (max-width: 480px) {
+  .pl-card { min-height: 600px; }
+  .pl-image-wrap { aspect-ratio: 1 / 1; }
+}

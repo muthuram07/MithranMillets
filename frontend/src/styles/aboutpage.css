@@ -1,0 +1,100 @@
+/* aboutpage.css - visual styles for AboutPage component */
+
+/* page base */
+.ap-page {
+  min-height: 100vh;
+  padding-top: 48px;
+  padding-bottom: 64px;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(233,197,106,0.04), transparent),
+              linear-gradient(180deg,#102a20 0%, #163b2d 45%, #1b4332 100%);
+  color: rgba(255,255,255,0.95);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* decorative overlay */
+.ap-decorative {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(233,197,106,0.06), transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* container */
+.ap-container { position: relative; z-index: 2; }
+
+/* header */
+.ap-header-row { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+.ap-title {
+  font-weight: 900;
+  font-family: Georgia, serif;
+  color: #fffbe6;
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+/* music control */
+.ap-music-control { margin-left: auto; }
+.ap-music-btn {
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+}
+
+/* intro paragraph */
+.ap-intro { margin-bottom: 28px; }
+.ap-intro-text {
+  max-width: 900px;
+  color: rgba(255,255,255,0.94);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* feature card */
+.ap-feature-paper {
+  padding: 20px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.06);
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ap-feature-head { display: flex; align-items: center; gap: 12px; }
+.ap-feature-avatar { background: #d4a373; color: #102a20; }
+.ap-feature-title { font-weight: 800; color: #e9c46a; margin: 0; }
+.ap-feature-body { color: rgba(255,255,255,0.95); }
+
+/* vision section */
+.ap-vision { margin-top: 48px; }
+.ap-vision-title { font-weight: 900; color: #e9c46a; margin-bottom: 8px; }
+.ap-vision-text { max-width: 900px; color: rgba(255,255,255,0.94); line-height: 1.6; }
+
+/* floating CTA */
+.ap-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  background: rgba(255,255,255,0.06);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.06);
+  z-index: 40;
+}
+
+/* responsive tweaks */
+@media (max-width: 900px) {
+  .ap-title { font-size: 1.8rem; }
+  .ap-decorative { width: 160px; height: 160px; right: 12px; top: 12px; }
+  .ap-intro-text, .ap-vision-text { font-size: 15px; }
+  .ap-feature-paper { min-height: 140px; }
+}
+@media (max-width: 480px) {
+  .ap-title { font-size: 1.4rem; }
+  .ap-decorative { display: none; }
+  .ap-fab { right: 12px; bottom: 12px; }
+}

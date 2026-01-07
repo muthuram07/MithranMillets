@@ -65,6 +65,26 @@ public class AuthController {
         return ResponseEntity.ok(users);
     }
 
+    @PostMapping("/admin/create")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> createAdmin(@Valid @RequestBody User user) {
+        logger.debug("POST /auth/admin/create username='{}' email='{}'", user.getUsername(), user.getEmail());
+        return authService.createAdmin(user);
+    }
+
+    @GetMapping("/admin/check")
+    public ResponseEntity<Map<String, Boolean>> checkAdminExists() {
+        logger.debug("GET /auth/admin/check (checking if admin exists)");
+        boolean exists = authService.hasAnyAdmin();
+        return ResponseEntity.ok(Map.of("hasAdmin", exists));
+    }
+
+    @PostMapping("/admin/setup")
+    public ResponseEntity<?> setupFirstAdmin(@Valid @RequestBody User user) {
+        logger.debug("POST /auth/admin/setup username='{}' email='{}'", user.getUsername(), user.getEmail());
+        return authService.createFirstAdmin(user);
+    }
+
     // --- Forgot / Reset Password endpoints ---
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {

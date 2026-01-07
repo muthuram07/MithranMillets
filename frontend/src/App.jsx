@@ -16,6 +16,8 @@ import OrderManager from './pages/admin/OrderManager';
 import UserManager from './pages/admin/UserManager';
 import AdminLayout from './layouts/AdminLayout';
 import CustomerLayout from './layouts/CustomerLayout';
+import AdminLanding from './pages/admin/AdminLanding';
+import AdminSetup from './pages/admin/AdminSetup';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Checkout from './pages/Checkout';
@@ -88,6 +90,11 @@ const App = () => {
 
               {/* Accept reset token via path param: /reset-password/:token */}
               <Route path="/reset-password/:token" element={<CustomerLayout><ResetPassword /></CustomerLayout>} />
+
+              {/* 🔐 Public Admin Routes */}
+              <Route path="/admin" element={<AdminLanding />} />
+              <Route path="/admin/login" element={<AdminLanding />} />
+              <Route path="/admin/setup" element={<AdminSetup />} />
 
               {/* 🔐 Protected Admin Routes */}
               <Route

@@ -263,4 +263,76 @@ public class AuthServiceImpl implements AuthService {
         Optional<User> u = userRepo.findById(username);
         return u.orElse(null);
     }
+    
+    @Override
+    public ResponseEntity<?> createAdmin(User user) {
+        logger.debug("Admin creation attempt for username '{}'", user.getUsername());
+        
+        // Ensure role is set to ADMIN
+        if (user.getRole() == null || !user.getRole().equals("ADMIN")) {
+            user.setRole("ADMIN");
+        }
+        
+        // Check if user already exists
+        Optional<User> existingUser = userRepo.findByUsername(user.getUsername());
+        if (existingUser.isPresent()) {
+            logger.info("Admin creation failed: username '{}' already exists", user.getUsername());
+            return ResponseEntity.status(409).body(Map.of("message", "User already exists"));
+        }
+        
+        // Check if email already exists
+        Optional<User> existingEmail = userRepo.findByEmail(user.getEmail());
+        if (existingEmail.isPresent()) {
+            logger.info("Admin creation failed: email '{}' already exists", user.getEmail());
+            return ResponseEntity.status(409).body(Map.of("message", "Email already exists"));
+        }
+        
+        // Encode password and save
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepo.save(user);
+        logger.info("Admin '{}' created successfully", user.getUsername());
+        return ResponseEntity.status(201).body(Map.of("message", "Admin created successfully"));
+    }
+    
+    @Override
+    public boolean hasAnyAdmin() {
+        logger.debug("Checking if any admin exists");
+        return userRepo.findAll()
+                .stream()
+                .anyMatch(u -> "ADMIN".equals(u.getRole()));
+    }
+    
+    @Override
+    public ResponseEntity<?> createFirstAdmin(User user) {
+        logger.debug("First admin creation attempt for username '{}'", user.getUsername());
+        
+        // Check if any admin already exists
+        if (hasAnyAdmin()) {
+            logger.warn("First admin creation failed: admin already exists");
+            return ResponseEntity.status(403).body(Map.of("message", "Admin already exists. Use the protected endpoint to create additional admins."));
+        }
+        
+        // Ensure role is set to ADMIN
+        user.setRole("ADMIN");
+        
+        // Check if user already exists
+        Optional<User> existingUser = userRepo.findByUsername(user.getUsername());
+        if (existingUser.isPresent()) {
+            logger.info("First admin creation failed: username '{}' already exists", user.getUsername());
+            return ResponseEntity.status(409).body(Map.of("message", "User already exists"));
+        }
+        
+        // Check if email already exists
+        Optional<User> existingEmail = userRepo.findByEmail(user.getEmail());
+        if (existingEmail.isPresent()) {
+            logger.info("First admin creation failed: email '{}' already exists", user.getEmail());
+            return ResponseEntity.status(409).body(Map.of("message", "Email already exists"));
+        }
+        
+        // Encode password and save
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepo.save(user);
+        logger.info("First admin '{}' created successfully", user.getUsername());
+        return ResponseEntity.status(201).body(Map.of("message", "First admin created successfully"));
+    }
 }

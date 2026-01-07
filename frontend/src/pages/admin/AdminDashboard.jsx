@@ -8,17 +8,29 @@ import {
   Button,
   Stack,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Alert,
+  InputAdornment,
+  IconButton,
 } from '@mui/material';
 import {
   Inventory2 as InventoryIcon,
   ShoppingCart as OrdersIcon,
   People as UsersIcon,
   Refresh as RefreshIcon,
+  PersonAdd as PersonAddIcon,
+  Visibility,
+  VisibilityOff,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import apiProduct from '../../services/apiProduct';
 import apiOrder from '../../services/apiOrder';
 import api from '../../services/api';
+import { toast } from 'react-toastify';
 
 /* Recharts (install: npm i recharts) */
 import {
@@ -86,6 +98,19 @@ const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
+  
+  // Admin creation dialog state
+  const [openDialog, setOpenDialog] = useState(false);
+  const [adminForm, setAdminForm] = useState({
+    username: '',
+    password: '',
+    email: '',
+    fullName: '',
+    phone: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [creatingAdmin, setCreatingAdmin] = useState(false);
+  const [adminFormErrors, setAdminFormErrors] = useState({});
 
   const fetchAllStats = useCallback(async (showToast = false) => {
     setLoading(true);
@@ -167,6 +192,72 @@ const AdminDashboard = () => {
 
   const pieColors = ['#2d6a4f', '#e9c46a', '#f4a261', '#e76f51', '#8ab17d'];
 
+  const validateAdminForm = () => {
+    const errors = {};
+    if (!adminForm.username || !adminForm.username.trim()) {
+      errors.username = 'Username is required';
+    } else if (adminForm.username.length > 50) {
+      errors.username = 'Username must be under 50 characters';
+    }
+    if (!adminForm.password || adminForm.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters';
+    }
+    if (!adminForm.email || !adminForm.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^\S+@\S+\.\S+$/.test(adminForm.email)) {
+      errors.email = 'Email should be valid';
+    }
+    if (!adminForm.fullName || !adminForm.fullName.trim()) {
+      errors.fullName = 'Full name is required';
+    } else if (adminForm.fullName.length > 100) {
+      errors.fullName = 'Full name must be under 100 characters';
+    }
+    if (adminForm.phone && !/^\d{10}$/.test(adminForm.phone)) {
+      errors.phone = 'Phone number must be 10 digits';
+    }
+    setAdminFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleCreateAdmin = async () => {
+    if (!validateAdminForm()) {
+      toast.error('Please fix the form errors');
+      return;
+    }
+
+    setCreatingAdmin(true);
+    try {
+      const payload = {
+        username: adminForm.username.trim(),
+        password: adminForm.password,
+        role: 'ADMIN',
+        email: adminForm.email.trim(),
+        fullName: adminForm.fullName.trim(),
+        phone: adminForm.phone || null,
+      };
+
+      await api.post('/auth/admin/create', payload);
+      toast.success('Admin created successfully!');
+      setOpenDialog(false);
+      setAdminForm({ username: '', password: '', email: '', fullName: '', phone: '' });
+      setAdminFormErrors({});
+      // Refresh stats to update user count
+      fetchAllStats();
+    } catch (err) {
+      console.error('Admin creation error:', err);
+      const errorMsg = err?.response?.data?.message || 'Failed to create admin';
+      toast.error(errorMsg);
+    } finally {
+      setCreatingAdmin(false);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setAdminForm({ username: '', password: '', email: '', fullName: '', phone: '' });
+    setAdminFormErrors({});
+  };
+
   if (loading) {
     return (
       <Container sx={{ mt: 4 }}>
@@ -181,9 +272,20 @@ const AdminDashboard = () => {
     <Container sx={{ mt: 4 }}>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 800, color: '#0b3d2e' }}>Admin Dashboard</Typography>
-        <Button startIcon={<RefreshIcon />} onClick={() => fetchAllStats(true)} variant="outlined" size="small">
-          Refresh
-        </Button>
+        <Stack direction="row" spacing={2}>
+          <Button
+            startIcon={<PersonAddIcon />}
+            onClick={() => setOpenDialog(true)}
+            variant="contained"
+            size="small"
+            sx={{ bgcolor: COLORS.primary, '&:hover': { bgcolor: '#1b4332' } }}
+          >
+            Create Admin
+          </Button>
+          <Button startIcon={<RefreshIcon />} onClick={() => fetchAllStats(true)} variant="outlined" size="small">
+            Refresh
+          </Button>
+        </Stack>
       </Stack>
 
       <Stack spacing={3}>
@@ -266,6 +368,87 @@ const AdminDashboard = () => {
           </Stack>
         </Paper>
       </Stack>
+
+      {/* Admin Creation Dialog */}
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 800, color: '#0b3d2e' }}>Create New Admin</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <TextField
+              fullWidth
+              label="Full Name"
+              value={adminForm.fullName}
+              onChange={(e) => setAdminForm({ ...adminForm, fullName: e.target.value })}
+              error={Boolean(adminFormErrors.fullName)}
+              helperText={adminFormErrors.fullName}
+              required
+            />
+            <TextField
+              fullWidth
+              label="Username"
+              value={adminForm.username}
+              onChange={(e) => setAdminForm({ ...adminForm, username: e.target.value })}
+              error={Boolean(adminFormErrors.username)}
+              helperText={adminFormErrors.username}
+              required
+            />
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+              value={adminForm.email}
+              onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
+              error={Boolean(adminFormErrors.email)}
+              helperText={adminFormErrors.email}
+              required
+            />
+            <TextField
+              fullWidth
+              label="Phone (10 digits)"
+              value={adminForm.phone}
+              onChange={(e) => {
+                const digits = e.target.value.replace(/\D/g, '');
+                setAdminForm({ ...adminForm, phone: digits });
+              }}
+              error={Boolean(adminFormErrors.phone)}
+              helperText={adminFormErrors.phone || 'Optional'}
+              inputProps={{ maxLength: 10 }}
+            />
+            <TextField
+              fullWidth
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={adminForm.password}
+              onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
+              error={Boolean(adminFormErrors.password)}
+              helperText={adminFormErrors.password || 'Minimum 8 characters'}
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={handleCloseDialog} disabled={creatingAdmin}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleCreateAdmin}
+            variant="contained"
+            disabled={creatingAdmin}
+            sx={{ bgcolor: COLORS.primary, '&:hover': { bgcolor: '#1b4332' } }}
+          >
+            {creatingAdmin ? <CircularProgress size={20} /> : 'Create Admin'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

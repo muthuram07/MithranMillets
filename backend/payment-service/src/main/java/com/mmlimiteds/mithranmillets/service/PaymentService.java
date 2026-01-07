@@ -31,18 +31,12 @@ public class PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    /**
-     * Creates a Razorpay order using the provided payment request and saves it to the database.
-     *
-     * @param request the payment request DTO
-     * @return the payment response DTO with order details
-     * @throws Exception if Razorpay fails
-     */
     public PaymentResponseDTO createOrder(PaymentRequestDTO request) {
         try {
             RazorpayClient client = new RazorpayClient(razorpayKey, razorpaySecret);
 
             JSONObject options = new JSONObject();
+            // Razorpay expects amount in paise (Rupees * 100)
             options.put("amount", (int)(request.getAmount() * 100));
             options.put("currency", request.getCurrency());
             options.put("receipt", request.getReceipt());
@@ -50,33 +44,36 @@ public class PaymentService {
 
             Order order = client.orders.create(options);
 
+            // Extract values safely as Strings
+            String orderId = order.get("id").toString();
+            String status = order.get("status").toString();
+            String receipt = order.get("receipt") != null ? order.get("receipt").toString() : request.getReceipt();
+
+            // Save to database
             Payment payment = new Payment();
             payment.setUsername(getCurrentUsername());
-            payment.setRazorpayOrderId(order.get("id"));
-            payment.setReceipt(order.get("receipt"));
+            payment.setRazorpayOrderId(orderId);
+            payment.setReceipt(receipt);
             payment.setAmount(request.getAmount());
             payment.setCurrency(request.getCurrency());
-            payment.setStatus(order.get("status"));
+            payment.setStatus(status);
             payment.setCreatedAt(new Date());
 
             paymentRepository.save(payment);
 
-            return new PaymentResponseDTO(
-                order.get("id"),
-                order.get("status"),
-                order.get("receipt")
-            );
+            // Using setters to ensure no constructor "undefined" errors occur
+            PaymentResponseDTO response = new PaymentResponseDTO();
+            response.setOrderId(orderId);
+            response.setStatus(status);
+            response.setReceipt(receipt);
+
+            return response;
+
         } catch (Exception e) {
-            throw new PaymentInitiationException(e.getMessage());
+            throw new PaymentInitiationException("Razorpay Order Creation Failed: " + e.getMessage());
         }
     }
 
-
-    /**
-     * Retrieves payment history for the authenticated user.
-     *
-     * @return list of payment records
-     */
     public List<Payment> getPaymentHistory() {
         String username = getCurrentUsername();
         return paymentRepository.findByUsername(username);

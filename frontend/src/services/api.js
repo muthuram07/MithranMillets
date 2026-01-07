@@ -9,7 +9,7 @@ api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
 
   // List of public endpoints that should NOT receive Authorization header
-  const publicPaths = ['/auth/login', '/auth/signup'];
+  const publicPaths = ['/auth/login', '/auth/signup', '/auth/admin/check', '/auth/admin/setup'];
 
   const isPublic = publicPaths.some(path => config.url?.includes(path));
 

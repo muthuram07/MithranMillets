@@ -24,4 +24,11 @@ public interface AuthService {
 
     ResponseEntity<?> resetPassword(String token, String newPassword);
     User findByUsername(String username);
+    
+    // Admin creation (protected - only admins can create other admins)
+    ResponseEntity<?> createAdmin(User user);
+    
+    // Admin setup (public - only works if no admin exists)
+    boolean hasAnyAdmin();
+    ResponseEntity<?> createFirstAdmin(User user);
 }

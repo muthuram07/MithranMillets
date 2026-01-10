@@ -1,37 +1,56 @@
 // src/App.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import ProductList from './pages/ProductList';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
-import Profile from './pages/Profile';
-import Orders from './pages/Orders';
+import { Box, CircularProgress } from '@mui/material';
 import ProtectedRoute from './components/ProtectedRoute';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import ProductManager from './pages/admin/ProductManager';
-import OrderManager from './pages/admin/OrderManager';
-import UserManager from './pages/admin/UserManager';
+import ErrorBoundary from './components/ErrorBoundary';
 import AdminLayout from './layouts/AdminLayout';
 import CustomerLayout from './layouts/CustomerLayout';
-import AdminLanding from './pages/admin/AdminLanding';
-import AdminSetup from './pages/admin/AdminSetup';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Checkout from './pages/Checkout';
-import Payment from './pages/Payment';
-import AboutPage from './pages/AboutPage';
-import ForgotPassword from './pages/ForgotPassword';
-import OrderSuccess from './pages/OrderSuccess';
-import ResetPassword from './pages/ResetPassword';
-import Support from './pages/Support';
-import OrderDetail from './pages/OrderDetail';
 
 // add providers
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+
+// Lazy load pages for code splitting and faster initial load
+const Landing = lazy(() => import('./pages/Landing'));
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const ProductList = lazy(() => import('./pages/ProductList'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Orders = lazy(() => import('./pages/Orders'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const ProductManager = lazy(() => import('./pages/admin/ProductManager'));
+const OrderManager = lazy(() => import('./pages/admin/OrderManager'));
+const UserManager = lazy(() => import('./pages/admin/UserManager'));
+const AdminLanding = lazy(() => import('./pages/admin/AdminLanding'));
+const AdminSetup = lazy(() => import('./pages/admin/AdminSetup'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Payment = lazy(() => import('./pages/Payment'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Support = lazy(() => import('./pages/Support'));
+const OrderDetail = lazy(() => import('./pages/OrderDetail'));
+
+// Loading component for Suspense fallback
+const LoadingFallback = () => (
+  <Box
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    minHeight="100vh"
+    sx={{
+      background: 'linear-gradient(180deg, #fbf7ef 0%, #f0e6cf 100%)'
+    }}
+  >
+    <CircularProgress size={60} sx={{ color: '#2d6a4f' }} />
+  </Box>
+);
 
 const STORAGE_KEY = {
   REMEMBER: 'auth_remember',
@@ -62,10 +81,12 @@ const App = () => {
 
   return (
     <>
-      <Router>
-        <AuthProvider>
-          <CartProvider>
-            <Routes>
+      <ErrorBoundary>
+        <Router>
+          <AuthProvider>
+            <CartProvider>
+              <Suspense fallback={<LoadingFallback />}>
+                <Routes>
               {/* 🌿 Public Customer Routes */}
               <Route path="/" element={<CustomerLayout><Landing /></CustomerLayout>} />
               <Route path="/login" element={<CustomerLayout><Login /></CustomerLayout>} />
@@ -139,11 +160,28 @@ const App = () => {
                   </CustomerLayout>
                 }
               />
-            </Routes>
-          </CartProvider>
-        </AuthProvider>
-        <ToastContainer position="top-right" autoClose={3000} />
-      </Router>
+                </Routes>
+              </Suspense>
+            </CartProvider>
+          </AuthProvider>
+          <ToastContainer 
+            position="top-right" 
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            toastStyle={{
+              fontSize: '14px',
+              maxWidth: '400px'
+            }}
+          />
+        </Router>
+      </ErrorBoundary>
     </>
   );
 };

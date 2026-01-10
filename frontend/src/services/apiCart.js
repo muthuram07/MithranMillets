@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { extractErrorInfo, logError } from '../utils/errorHandler';
 
 // Determine base URL safely (Vite, CRA, fallback)
 const baseUrl =
@@ -8,18 +9,51 @@ const baseUrl =
 
 const apiCartInstance = axios.create({
   baseURL: baseUrl,
+  timeout: 30000, // 30 seconds timeout
   // withCredentials: true, // enable if backend uses cookies
 });
 
 // Attach bearer token like apiOrder
-apiCartInstance.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
+apiCartInstance.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => {
+    logError(error, 'CartService.request');
+    return Promise.reject(error);
   }
-  return config;
-});
+);
+
+// Enhanced response interceptor with comprehensive error handling
+apiCartInstance.interceptors.response.use(
+  res => res,
+  err => {
+    // Log error for debugging
+    logError(err, 'CartService.response');
+    
+    // Extract error information
+    const errorInfo = extractErrorInfo(err);
+    
+    // Handle 401 Unauthorized
+    if (err.response?.status === 401) {
+      localStorage.clear();
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+    }
+
+    // Enhance error object with sanitized message
+    err.userMessage = errorInfo.message;
+    err.errorType = errorInfo.type;
+    
+    return Promise.reject(err);
+  }
+);
 
 // GET cart (expects array of CartItemDTO)
 const getCart = () => apiCartInstance.get('/cart');

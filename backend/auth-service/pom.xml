@@ -122,6 +122,29 @@
       <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
     </dependency>
 
+    <!-- Testing -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>1.19.3</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Eureka Server (if you want to run a server in another project) -->
     <!-- Remove the local com.example:EurekaServer dependency -->
     <!-- Use the official starter instead -->

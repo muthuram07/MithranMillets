@@ -1,27 +1,29 @@
 package com.mmlimiteds.mithranmillets.dto;
 
-import java.sql.Date;
+import java.util.Date; // Use util.Date for better compatibility
 import java.util.List;
+import java.util.ArrayList;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDTO {
-    public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public Long getId() {
+    public Long getId() {
 		return id;
 	}
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public Double getTotalAmount() {
@@ -88,16 +90,19 @@ public class OrderDTO {
 		this.items = items;
 	}
 
-	private String username;
-    private Long id;
+	private Long id;
+    private String username;
     private Double totalAmount;
     private String paymentMethod;
     private String status;
+    
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date orderDate;
+    
     private AddressDTO address;
     private String razorpayOrderId;
     private String paymentStatus;
 
-    // ✅ Add this field
-    private List<OrderItemDTO> items;
+    // Initialize to avoid empty list serialization issues
+    private List<OrderItemDTO> items = new ArrayList<>();
 }

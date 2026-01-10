@@ -14,147 +14,170 @@ import java.math.BigDecimal;
 @Table(name = "orders")
 public class Order {
 
-  public Long getId() {
-		return id;
-	}
+    /* =========================
+       GETTERS & SETTERS
+       ========================= */
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public BigDecimal getSubtotal() {
-		return subtotal;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public void setSubtotal(BigDecimal subtotal) {
-		this.subtotal = subtotal;
-	}
+    public BigDecimal getSubtotal() {
+        return subtotal;
+    }
 
-	public BigDecimal getTotalAmount() {
-		return totalAmount;
-	}
+    public void setSubtotal(BigDecimal subtotal) {
+        this.subtotal = subtotal;
+    }
 
-	public void setTotalAmount(BigDecimal totalAmount) {
-		this.totalAmount = totalAmount;
-	}
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
 
-	public Integer getTotalQuantity() {
-		return totalQuantity;
-	}
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
 
-	public void setTotalQuantity(Integer totalQuantity) {
-		this.totalQuantity = totalQuantity;
-	}
+    public Integer getTotalQuantity() {
+        return totalQuantity;
+    }
 
-	public String getPaymentMethod() {
-		return paymentMethod;
-	}
+    public void setTotalQuantity(Integer totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
 
-	public void setPaymentMethod(String paymentMethod) {
-		this.paymentMethod = paymentMethod;
-	}
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public Date getOrderDate() {
-		return orderDate;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public void setOrderDate(Date orderDate) {
-		this.orderDate = orderDate;
-	}
+    public Date getOrderDate() {
+        return orderDate;
+    }
 
-	public Address getAddress() {
-		return address;
-	}
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
+    }
 
-	public void setAddress(Address address) {
-		this.address = address;
-	}
+    public Address getAddress() {
+        return address;
+    }
 
-	public String getRazorpayOrderId() {
-		return razorpayOrderId;
-	}
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 
-	public void setRazorpayOrderId(String razorpayOrderId) {
-		this.razorpayOrderId = razorpayOrderId;
-	}
+    public String getRazorpayOrderId() {
+        return razorpayOrderId;
+    }
 
-	public String getPaymentStatus() {
-		return paymentStatus;
-	}
+    public void setRazorpayOrderId(String razorpayOrderId) {
+        this.razorpayOrderId = razorpayOrderId;
+    }
 
-	public void setPaymentStatus(String paymentStatus) {
-		this.paymentStatus = paymentStatus;
-	}
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
 
-	public List<OrderItem> getOrderItems() {
-		return orderItems;
-	}
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 
-	public void setOrderItems(List<OrderItem> orderItems) {
-		this.orderItems = orderItems;
-	}
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
 
-  @Column(nullable = false)
-  @NotBlank(message = "Username is required")
-  private String username;
+    public List<OrderStatusHistory> getStatusHistory() {
+        return statusHistory;
+    }
 
-  @Column(name = "subtotal", precision = 15, scale = 2)
-  @DecimalMin(value = "0.00", inclusive = true, message = "Subtotal must be >= 0")
-  private BigDecimal subtotal;
+    public void setStatusHistory(List<OrderStatusHistory> statusHistory) {
+        this.statusHistory = statusHistory;
+    }
 
-  @NotNull(message = "Total amount is required")
-  @Column(name = "total_amount", precision = 15, scale = 2, nullable = false)
-  @DecimalMin(value = "0.00", inclusive = false, message = "Amount must be greater than zero")
-  private BigDecimal totalAmount;
+    /* =========================
+       FIELDS
+       ========================= */
 
-  @NotNull(message = "Total quantity is required")
-  @Min(value = 0, message = "Quantity must be >= 0")
-  @Column(name = "total_quantity", nullable = false)
-  private Integer totalQuantity;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @NotBlank(message = "Payment method is required")
-  private String paymentMethod;
+    @Column(nullable = false)
+    @NotBlank(message = "Username is required")
+    private String username;
 
-  @NotBlank(message = "Order status is required")
-  private String status;
+    @Column(name = "subtotal", precision = 15, scale = 2)
+    @DecimalMin(value = "0.00", inclusive = true)
+    private BigDecimal subtotal;
 
-  @Temporal(TemporalType.TIMESTAMP)
-  @NotNull(message = "Order date is required")
-  private Date orderDate;
+    @NotNull(message = "Total amount is required")
+    @Column(name = "total_amount", precision = 15, scale = 2, nullable = false)
+    @DecimalMin(value = "0.00", inclusive = false)
+    private BigDecimal totalAmount;
 
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "address_id")
-  @NotNull(message = "Address is required")
-  private Address address;
+    @NotNull(message = "Total quantity is required")
+    @Min(value = 0)
+    @Column(name = "total_quantity", nullable = false)
+    private Integer totalQuantity;
 
-  @Column(name = "razorpay_order_id")
-  private String razorpayOrderId;
+    @NotBlank(message = "Payment method is required")
+    private String paymentMethod;
 
-  @Column(name = "payment_status")
-  private String paymentStatus;
+    @NotBlank(message = "Order status is required")
+    private String status;
 
-  // ✅ Include this to support item-level history
-  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<OrderItem> orderItems;
+    @Temporal(TemporalType.TIMESTAMP)
+    @NotNull(message = "Order date is required")
+    private Date orderDate;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "address_id")
+    @NotNull(message = "Address is required")
+    private Address address;
+
+    @Column(name = "razorpay_order_id")
+    private String razorpayOrderId;
+
+    @Column(name = "payment_status")
+    private String paymentStatus;
+
+    /* =========================
+       RELATIONSHIPS (CRITICAL)
+       ========================= */
+
+    // ✅ Order → OrderItems
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems;
+
+    // ✅ Order → OrderStatusHistory (THIS FIXES DELETE)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderStatusHistory> statusHistory;
 }

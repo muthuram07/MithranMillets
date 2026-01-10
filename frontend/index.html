@@ -3,13 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.jpg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mithran-millets</title>
+    <!-- Mobile viewport optimization -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- Preconnect to external domains for faster loading -->
+    <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin />
+    <!-- DNS prefetch for performance -->
+    <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+    <title>Mithran Millets - Healthy Living</title>
     
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Load Razorpay script asynchronously for better performance -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js" async defer></script>
   </body>
 </html>

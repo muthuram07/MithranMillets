@@ -16,6 +16,8 @@ import {
   Alert,
   InputAdornment,
   IconButton,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Inventory2 as InventoryIcon,
@@ -31,6 +33,7 @@ import apiProduct from '../../services/apiProduct';
 import apiOrder from '../../services/apiOrder';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
+import { handleError } from '../../utils/errorHandler';
 
 /* Recharts (install: npm i recharts) */
 import {
@@ -91,6 +94,8 @@ const formatDateKey = (d) => {
 };
 
 const AdminDashboard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [stats, setStats] = useState({ products: 0, orders: 0, users: 0 });
   const [prev, setPrev] = useState({ products: 0, orders: 0, users: 0 });
   const [loading, setLoading] = useState(true);
@@ -135,10 +140,10 @@ const AdminDashboard = () => {
         users: userList.length,
       });
 
-      if (showToast) console.log('Dashboard refreshed');
+      if (showToast) toast.success('Dashboard refreshed');
     } catch (err) {
-      console.error(err);
-      console.error('Failed to load dashboard stats');
+      const errorMsg = handleError(err, 'AdminDashboard.fetchAllStats');
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -244,8 +249,7 @@ const AdminDashboard = () => {
       // Refresh stats to update user count
       fetchAllStats();
     } catch (err) {
-      console.error('Admin creation error:', err);
-      const errorMsg = err?.response?.data?.message || 'Failed to create admin';
+      const errorMsg = handleError(err, 'AdminDashboard.handleCreateAdmin');
       toast.error(errorMsg);
     } finally {
       setCreatingAdmin(false);
@@ -269,20 +273,53 @@ const AdminDashboard = () => {
   }
 
   return (
-    <Container sx={{ mt: 4 }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800, color: '#0b3d2e' }}>Admin Dashboard</Typography>
-        <Stack direction="row" spacing={2}>
+    <Container 
+      maxWidth="lg"
+      sx={{ 
+        mt: { xs: 2, md: 4 },
+        mb: { xs: 2, md: 4 },
+      }}
+    >
+      <Stack 
+        direction={{ xs: 'column', sm: 'row' }} 
+        alignItems={{ xs: 'flex-start', sm: 'center' }} 
+        justifyContent="space-between" 
+        spacing={2}
+        sx={{ mb: 3 }}
+      >
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 800, 
+            color: '#0b3d2e',
+            fontSize: { xs: '1.75rem', md: '2.125rem' }
+          }}
+        >
+          Admin Dashboard
+        </Typography>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: { xs: '100%', sm: 'auto' } }}>
           <Button
             startIcon={<PersonAddIcon />}
             onClick={() => setOpenDialog(true)}
             variant="contained"
             size="small"
-            sx={{ bgcolor: COLORS.primary, '&:hover': { bgcolor: '#1b4332' } }}
+            fullWidth={isMobile}
+            sx={{ 
+              bgcolor: COLORS.primary, 
+              '&:hover': { bgcolor: '#1b4332' },
+              minHeight: { xs: 44, sm: 'auto' }
+            }}
           >
             Create Admin
           </Button>
-          <Button startIcon={<RefreshIcon />} onClick={() => fetchAllStats(true)} variant="outlined" size="small">
+          <Button 
+            startIcon={<RefreshIcon />} 
+            onClick={() => fetchAllStats(true)} 
+            variant="outlined" 
+            size="small"
+            fullWidth={isMobile}
+            sx={{ minHeight: { xs: 44, sm: 'auto' } }}
+          >
             Refresh
           </Button>
         </Stack>

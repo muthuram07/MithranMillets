@@ -1,5 +1,7 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -11,28 +13,51 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* Mobile optimization */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
+  /* Improve touch targets on mobile */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 a:hover {
   color: #535bf2;
 }
+a:active {
+  opacity: 0.7;
+}
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  padding: 0;
   min-width: 320px;
   min-height: 100vh;
+  /* Prevent text size adjust on mobile */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Improve scrolling on mobile */
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: clamp(2rem, 5vw, 3.2em);
   line-height: 1.1;
+  /* Prevent overflow on small screens */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 button {
@@ -45,13 +70,54 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+  /* Improve touch targets on mobile - minimum 44x44px */
+  min-height: 44px;
+  min-width: 44px;
+  /* Prevent text selection on tap */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
 }
 button:hover {
   border-color: #646cff;
 }
+button:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid #646cff;
+  outline-offset: 2px;
+}
+
+/* Improve form inputs on mobile */
+input, textarea, select {
+  font-size: 16px; /* Prevents zoom on iOS */
+  min-height: 44px; /* Better touch targets */
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px; /* Prevent text zoom on iOS */
+  }
+  
+  button, a {
+    min-height: 44px; /* Ensure touch targets are large enough */
+  }
+}
+
+/* Prevent horizontal scroll on mobile */
+@media (max-width: 480px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  * {
+    max-width: 100%;
+  }
 }
 
 @media (prefers-color-scheme: light) {
@@ -64,5 +130,24 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+/* Improve loading performance */
+img {
+  max-width: 100%;
+  height: auto;
+  /* Lazy loading hint */
+  loading: lazy;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

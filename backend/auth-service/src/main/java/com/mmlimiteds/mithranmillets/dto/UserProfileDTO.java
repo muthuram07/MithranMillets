@@ -7,7 +7,15 @@ public class UserProfileDTO {
     private String username;
     private String email;
     private String fullName;
+    private String role;
     private String phone;
+    public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
+	
 	public String getUsername() {
 		return username;
 	}

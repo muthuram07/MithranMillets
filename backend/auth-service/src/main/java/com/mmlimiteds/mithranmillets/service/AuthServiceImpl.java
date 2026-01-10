@@ -150,12 +150,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public List<UserProfileDTO> getAllUsersForAdmin() {
-        logger.debug("Fetching all users for admin");
-        return userRepo.findAll()
-                .stream()
-                .map(this::toProfileDto)
-                .collect(Collectors.toList());
+        return userRepo.findAll().stream().map(user -> {
+            UserProfileDTO dto = new UserProfileDTO();
+            dto.setUsername(user.getUsername());
+            dto.setEmail(user.getEmail());
+            dto.setFullName(user.getFullName());
+            dto.setPhone(user.getPhone());
+            dto.setRole(user.getRole()); 
+            return dto;
+        }).toList();
     }
+
 
     private UserProfileDTO toProfileDto(User user) {
         return modelMapper.map(user, UserProfileDTO.class);

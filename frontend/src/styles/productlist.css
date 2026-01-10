@@ -190,11 +190,62 @@
 
 /* responsive tweaks */
 @media (max-width: 900px) {
-  .pl-card { min-height: 560px; }
-  .pl-image-wrap { aspect-ratio: 4 / 3; }
+  .pl-page {
+    padding-top: 56px;
+    padding-bottom: 32px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .pl-card { 
+    min-height: 560px; 
+  }
+  .pl-image-wrap { 
+    aspect-ratio: 4 / 3; 
+  }
+  .pl-search-field {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
-  .pl-card { min-height: 600px; }
-  .pl-image-wrap { aspect-ratio: 1 / 1; }
+  .pl-page {
+    padding-top: 48px;
+    padding-bottom: 24px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  .pl-title {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+  .pl-card { 
+    min-height: 580px; 
+    box-shadow: 0 4px 12px rgba(11,61,46,0.08);
+  }
+  .pl-image-wrap { 
+    aspect-ratio: 1 / 1; 
+  }
+  .pl-card-content {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+  .pl-actions {
+    padding: 12px;
+    gap: 8px;
+  }
+  .pl-view-btn,
+  .pl-add-btn {
+    font-size: 0.875rem;
+    padding: 8px 12px;
+  }
+  .pl-search-paper {
+    padding: 8px 12px;
+    margin-bottom: 16px;
+  }
+  /* Improve touch targets on mobile */
+  .pl-view-btn,
+  .pl-add-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }

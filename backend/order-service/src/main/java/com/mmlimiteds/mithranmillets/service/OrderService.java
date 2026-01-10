@@ -2,7 +2,6 @@ package com.mmlimiteds.mithranmillets.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,7 +90,7 @@ public class OrderService {
         BigDecimal deliveryCharge = subtotal.compareTo(BigDecimal.valueOf(500)) < 0 ? BigDecimal.valueOf(40) : BigDecimal.ZERO;
         BigDecimal totalAmount = subtotal.add(tax).add(deliveryCharge).setScale(2, RoundingMode.HALF_UP);
 
-        // Save Order
+        // 1. Create and Save Order Entity
         Order order = new Order();
         order.setSubtotal(subtotal.setScale(2, RoundingMode.HALF_UP));
         order.setTotalQuantity(totalQty);
@@ -101,12 +100,12 @@ public class OrderService {
         order.setOrderDate(new Date());
         order.setAddress(address);
         order.setUsername(username);
-        Order saved = orderRepo.save(order);
+        Order savedOrder = orderRepo.save(order);
 
-        // Save Items
+        // 2. Create and Save OrderItems
         List<OrderItem> orderItems = cartItems.stream().map(ci -> {
             OrderItem item = new OrderItem();
-            item.setOrder(saved);
+            item.setOrder(savedOrder);
             item.setProductId(ci.getProductId());
             item.setName(ci.getProductName());
             item.setQuantity(ci.getQuantity());
@@ -116,18 +115,18 @@ public class OrderService {
         }).collect(Collectors.toList());
         orderItemRepo.saveAll(orderItems);
 
-        // FIXED: Payment Request (Using Setters to avoid constructor errors)
+        // 3. Payment Integration
         PaymentRequestDTO paymentRequest = new PaymentRequestDTO();
         paymentRequest.setAmount(totalAmount.doubleValue());
         paymentRequest.setCurrency("INR");
-        paymentRequest.setReceipt("order_rcpt_" + saved.getId());
+        paymentRequest.setReceipt("order_rcpt_" + savedOrder.getId());
         PaymentResponseDTO paymentResponse = paymentClient.initiatePayment(paymentRequest);
 
-        saved.setRazorpayOrderId(paymentResponse.getOrderId());
-        saved.setPaymentStatus("PENDING");
-        orderRepo.save(saved);
+        savedOrder.setRazorpayOrderId(paymentResponse.getOrderId());
+        savedOrder.setPaymentStatus("PENDING");
+        orderRepo.save(savedOrder);
 
-        // FIXED: Stock Update (Using Setters)
+        // 4. Stock Update
         List<ProductStockUpdateDTO> stockUpdates = cartItems.stream().map(item -> {
             ProductStockUpdateDTO u = new ProductStockUpdateDTO();
             u.setProductId(item.getProductId());
@@ -138,29 +137,38 @@ public class OrderService {
 
         cartClient.clearCart(token);
 
-        OrderDTO response = modelMapper.map(saved, OrderDTO.class);
-        response.setItems(orderItems.stream().map(i -> modelMapper.map(i, OrderItemDTO.class)).collect(Collectors.toList()));
+        // 5. Build clean Response DTO (This fixes the 500 Serialization error)
+        OrderDTO responseDto = modelMapper.map(savedOrder, OrderDTO.class);
+        List<OrderItemDTO> itemDtos = orderItems.stream()
+                .map(item -> modelMapper.map(item, OrderItemDTO.class))
+                .collect(Collectors.toList());
+        responseDto.setItems(itemDtos);
 
-        // Async Email
+        // 6. Async Email (Wrapped in try-catch to ensure it never breaks the response)
         try {
             UserDto user = fetchUser(username);
             if (user != null && StringUtils.hasText(user.getEmail())) {
-                emailService.sendOrderStatusEmail(user.getEmail(), "PLACED", saved.getId().toString(), 
-                    StringUtils.hasText(user.getFullName()) ? user.getFullName() : username, buildOrderSummaryHtml(orderItems));
+                emailService.sendOrderStatusEmail(
+                    user.getEmail(), 
+                    "PLACED", 
+                    savedOrder.getId().toString(), 
+                    StringUtils.hasText(user.getFullName()) ? user.getFullName() : username, 
+                    buildOrderSummaryHtml(orderItems)
+                );
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            // Log but ignore so customer still sees order confirmation
+        }
 
-        return response;
+        return responseDto;
     }
 
     @Transactional(readOnly = true)
     public SummaryTotalsDTO fetchCurrentCartTotals() {
         String username = getCurrentUsername();
         String token = "Bearer " + jwtUtil.generateToken(username, "USER");
-
         List<CartItemDTO> cartItems = cartClient.getCartItems(token);
         
-        // FIXED: Summary Totals (Using Setters)
         SummaryTotalsDTO summary = new SummaryTotalsDTO();
         if (cartItems == null || cartItems.isEmpty()) {
             summary.setTotalQuantity(0);
@@ -170,7 +178,8 @@ public class OrderService {
 
         int totalQty = cartItems.stream().mapToInt(ci -> ci.getQuantity() == null ? 0 : ci.getQuantity()).sum();
         BigDecimal subtotal = cartItems.stream()
-                .map(ci -> BigDecimal.valueOf(ci.getPrice() == null ? 0 : ci.getPrice()).multiply(BigDecimal.valueOf(ci.getQuantity() == null ? 0 : ci.getQuantity())))
+                .map(ci -> BigDecimal.valueOf(ci.getPrice() == null ? 0 : ci.getPrice())
+                .multiply(BigDecimal.valueOf(ci.getQuantity() == null ? 0 : ci.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         summary.setTotalQuantity(totalQty);
@@ -247,7 +256,9 @@ public class OrderService {
 
     public OrderDTO getOrderById(Long orderId) {
         Order order = orderRepo.findById(orderId).orElseThrow(() -> new OrderNotFoundException("ID: " + orderId));
-        return modelMapper.map(order, OrderDTO.class);
+        OrderDTO dto = modelMapper.map(order, OrderDTO.class);
+        dto.setItems(order.getOrderItems().stream().map(i -> modelMapper.map(i, OrderItemDTO.class)).collect(Collectors.toList()));
+        return dto;
     }
 
     private UserDto fetchUser(String username) {
@@ -258,13 +269,27 @@ public class OrderService {
     }
 
     private String buildOrderSummaryHtml(List<OrderItem> items) {
-        StringBuilder sb = new StringBuilder("<table border='1' style='border-collapse:collapse;'><tr><th>Item</th><th>Qty</th><th>Price</th></tr>");
+        StringBuilder sb = new StringBuilder("<table border='1' style='border-collapse:collapse;width:100%;'><tr><th>Item</th><th>Qty</th><th>Price</th></tr>");
         for (OrderItem it : items) {
-            sb.append("<tr><td>").append(it.getName()).append("</td><td>")
+            sb.append("<tr><td>").append(it.getName()).append("</td><td align='center'>")
               .append(it.getQuantity()).append("</td><td>₹")
               .append(it.getUnitPrice()).append("</td></tr>");
         }
         sb.append("</table>");
         return sb.toString();
+    }
+    public void deleteOrderById(Long orderId) {
+
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() ->
+                        new RuntimeException("Order not found with id: " + orderId)
+                );
+
+        // 🚫 SAFETY RULE: DO NOT DELETE DELIVERED ORDERS
+        if ("DELIVERED".equals(order.getStatus())) {
+            throw new IllegalStateException("Delivered orders cannot be deleted");
+        }
+
+        orderRepo.delete(order);
     }
 }

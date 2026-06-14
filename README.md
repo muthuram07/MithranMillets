@@ -60,12 +60,18 @@ This project follows a decoupled microservices design to handle specific busines
     ```
 
 2.  **Database Setup:**
-    Create a database in MySQL for each service as specified in the `application.properties` files.
-    ```sql
-    CREATE DATABASE mithran_auth;
-    CREATE DATABASE mithran_product;
-    -- Repeat for Cart, Order, and Payment services
+    The five services connect to the Aiven databases `authdb`, `productdb`,
+    `cartdb`, `orderdb`, and `paymentdb`. Configure these environment variables
+    before starting the backend:
+    ```text
+    DB_HOST=mithranmillets-muthuraman31-db0d.e.aivencloud.com
+    DB_PORT=24610
+    DB_USERNAME=avnadmin
+    DB_PASSWORD=your_aiven_password
     ```
+    `DB_HOST`, `DB_PORT`, and `DB_USERNAME` have Aiven defaults in the Spring
+    configuration. `DB_PASSWORD` is required and must be configured in the
+    hosting platform rather than committed to source control.
 
 3.  **Run the Eureka Server:**
     Navigate to the discovery-server directory and run:

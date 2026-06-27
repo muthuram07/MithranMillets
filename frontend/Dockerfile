@@ -1,4 +1,4 @@
-FROM node:20-alpine as build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
@@ -19,8 +19,8 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install serve to run the static files
-RUN npm install -g serve
+# Install serve locally
+RUN npm install serve
 
 # Copy built app from build stage
 COPY --from=build /app/dist ./dist
@@ -33,4 +33,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 
 # Start the application
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["npx", "serve", "-s", "dist", "-l", "3000"]

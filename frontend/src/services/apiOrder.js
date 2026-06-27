@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { extractErrorInfo, logError } from '../utils/errorHandler';
 
+const baseURL = import.meta.env.VITE_ORDER_API_BASE_URL || 'http://localhost:8083';
+
 const apiOrder = axios.create({
-  baseURL: 'http://localhost:8083',
+  baseURL,
   timeout: 30000, // 30 seconds timeout
 });
 

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.mmlimiteds.mithranmillets.dto.UserDto;
 
-@FeignClient(name = "auth-service", url = "http://localhost:8085") // adjust URL or use service discovery
+@FeignClient(name = "auth-service", url = "${AUTH_SERVICE_URL:http://localhost:8085}")
 public interface UserFeignClient {
 
     @GetMapping("/auth/internal/user/{username}")

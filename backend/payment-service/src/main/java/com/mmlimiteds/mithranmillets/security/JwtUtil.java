@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -16,8 +17,11 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtil {
 
     // ✅ Secure key: must be at least 256 bits (32+ characters)
-    private static final String SECRET = "MithranMilletsUltraSecureKey_1234567890_ABCDEF!";
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    private final Key key;
+
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     // 🔐 Generate token with optional role claim
     public String generateToken(String username, String role) {

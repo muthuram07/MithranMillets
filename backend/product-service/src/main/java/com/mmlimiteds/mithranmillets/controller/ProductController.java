@@ -36,7 +36,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin(origins = "http://localhost:5174")
 public class ProductController {
 	
 	private static final Logger log = LoggerFactory.getLogger(ProductService.class);

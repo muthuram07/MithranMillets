@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { extractErrorInfo, logError } from '../utils/errorHandler';
 
+const baseURL = import.meta.env.VITE_AUTH_API_BASE_URL || 'http://localhost:8085';
+
 const api = axios.create({
-  baseURL: 'http://localhost:8085',
+  baseURL,
   timeout: 30000, // 30 seconds timeout for better UX on mobile
 });
 

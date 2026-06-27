@@ -25,7 +25,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/cart")
-@CrossOrigin(origins = "http://localhost:5174", allowCredentials = "true")
 @Validated
 public class CartController {
 

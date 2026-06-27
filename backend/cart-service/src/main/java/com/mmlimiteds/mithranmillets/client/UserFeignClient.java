@@ -11,7 +11,7 @@ import com.mmlimiteds.mithranmillets.dto.UserDto;
  * Feign client to call the Auth service internal endpoint to fetch user details.
  * Auth service runs on port 8085 (as you provided).
  */
-@FeignClient(name = "auth-service", url = "http://localhost:8085")
+@FeignClient(name = "auth-service", url = "${AUTH_SERVICE_URL:http://localhost:8085}")
 public interface UserFeignClient {
 
     @GetMapping("/auth/internal/user/{username}")

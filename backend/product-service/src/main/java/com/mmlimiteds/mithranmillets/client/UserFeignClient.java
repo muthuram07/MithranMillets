@@ -8,7 +8,7 @@ import com.mmlimiteds.mithranmillets.dto.UserDto;
 
 @FeignClient(
 	    name = "auth-service",
-	    url = "http://localhost:8085",
+	    url = "${AUTH_SERVICE_URL:http://localhost:8085}",
 	    configuration = FeignClientConfig.class
 	)
 	public interface UserFeignClient {

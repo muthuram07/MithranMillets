@@ -1,10 +1,9 @@
 import axios from 'axios';
 import { extractErrorInfo, logError } from '../utils/errorHandler';
 
-// Determine base URL safely (Vite, CRA, fallback)
+// Determine base URL safely (Vite environment variable first, then fallback)
 const baseUrl =
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_CART_API_BASE_URL) ||
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_CART_API_BASE_URL) ||
+  import.meta.env.VITE_CART_API_BASE_URL ||
   'http://localhost:8082';
 
 const apiCartInstance = axios.create({

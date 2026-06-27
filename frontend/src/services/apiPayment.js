@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { extractErrorInfo, logError } from '../utils/errorHandler';
 
+const baseURL = import.meta.env.VITE_PAYMENT_API_BASE_URL || 'http://localhost:8084';
+
 const apiPayment = axios.create({
-  baseURL: 'http://localhost:8084',
+  baseURL,
   timeout: 30000, // 30 seconds timeout
 });
 

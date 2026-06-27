@@ -32,7 +32,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/order")
-@CrossOrigin(origins = "http://localhost:5174")
 public class OrderController {
 
     private final OrderService service;

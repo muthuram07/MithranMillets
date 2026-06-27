@@ -8,7 +8,7 @@ import com.mmlimiteds.mithranmillets.dto.ProductStockUpdateDTO;
 
 import java.util.List;
 
-@FeignClient(name = "product-service", url = "http://localhost:8081") 
+@FeignClient(name = "product-service", url = "${PRODUCT_SERVICE_URL:http://localhost:8081}")
 public interface ProductClient {
 
 	 @PutMapping("/products/update-stock") 

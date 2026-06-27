@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardMedia, Typography, Button, Box } from '@mui/material';
 
-const BASE_URL = 'http://localhost:8081';
+const BASE_URL = import.meta.env.VITE_PRODUCT_API_BASE_URL || 'http://localhost:8081';
 
 /**
  * Fixed-size product tile (slightly rectangular) with:

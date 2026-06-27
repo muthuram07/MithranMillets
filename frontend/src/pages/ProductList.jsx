@@ -41,7 +41,7 @@ import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/productlist.css';
 
-const BASE_URL = 'http://localhost:8081';
+const BASE_URL = import.meta.env.VITE_PRODUCT_API_BASE_URL || 'http://localhost:8081';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
